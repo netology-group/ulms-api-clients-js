@@ -51,4 +51,5 @@ dist
 .Spotlight-V100
 .Trashes
 
-lib/
+/lib/
+/es/
