@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 
-import { Codec } from './codec'
-import { MQTTRPCService } from './mqtt-rpc'
+import { Codec } from './codec.js'
+import { MQTTRPCService } from './mqtt-rpc.js'
 
 class Service {
   constructor (mqttClient, agentId, appName) {

@@ -3,7 +3,8 @@
     "es": {
       "presets": [
         ["@babel/preset-env", {
-          "modules": false
+          "modules": false,
+          "targets": "last 2 versions"
         }]
       ],
       "plugins": [
@@ -12,6 +13,13 @@
     },
     "lib": {
       "presets": ["@babel/preset-env"]
+    },
+    "rollup": {
+      "presets": [
+        ["@babel/preset-env", {
+          "modules": false
+        }]
+      ]
     }
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Service } from './service'
+import { Service } from './service.js'
 
 class Conference extends Service {
   /**
