@@ -118,7 +118,6 @@ class Event extends Service {
     const {
       direction,
       label,
-      last_created_at,
       last_occurred_at,
       limit,
       set,
@@ -127,7 +126,6 @@ class Event extends Service {
     const params = {
       direction,
       label,
-      last_created_at,
       last_occurred_at,
       limit,
       room_id,
@@ -147,12 +145,10 @@ class Event extends Service {
    */
   readState (room_id, sets, filterParams = {}) {
     const {
-      last_created_at,
       limit,
       occurred_at
     } = filterParams
     const params = {
-      last_created_at,
       limit,
       occurred_at,
       room_id,
