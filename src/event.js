@@ -96,9 +96,16 @@ class Event extends Service {
    * @returns {Promise}
    */
   createEvent (room_id, type, data, eventParams = {}) {
-    const { label, set } = eventParams
+    const {
+      is_claim,
+      is_persistent,
+      label,
+      set
+    } = eventParams
     const params = {
       data,
+      is_claim,
+      is_persistent,
       label,
       room_id,
       set,
