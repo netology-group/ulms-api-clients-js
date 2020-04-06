@@ -153,11 +153,13 @@ class Event extends Service {
   readState (room_id, sets, filterParams = {}) {
     const {
       limit,
-      occurred_at
+      occurred_at,
+      original_occurred_at
     } = filterParams
     const params = {
       limit,
       occurred_at,
+      original_occurred_at,
       room_id,
       sets
     }
