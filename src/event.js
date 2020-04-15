@@ -3,6 +3,18 @@ import { Service } from './service.js'
 
 class Event extends Service {
   /**
+   * Change type enum
+   * @returns {{ADDITION: string, MODIFICATION: string, REMOVAL: string}}
+   */
+  static get changeTypes () {
+    return {
+      ADDITION: 'addition',
+      MODIFICATION: 'modification',
+      REMOVAL: 'removal'
+    }
+  }
+
+  /**
    * Events enum
    * @returns {{EVENT_CREATE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
    */
@@ -42,6 +54,23 @@ class Event extends Service {
     }
 
     return this._rpc.send('room.read', params)
+  }
+
+  /**
+   * Update room
+   * @param id
+   * @param {Object} updateParams
+   * @returns {Promise}
+   */
+  updateRoom (id, updateParams) {
+    const { tags, time } = updateParams
+    const params = {
+      id,
+      tags,
+      time
+    }
+
+    return this._rpc.send('room.update', params)
   }
 
   /**
@@ -165,6 +194,109 @@ class Event extends Service {
     }
 
     return this._rpc.send('state.read', params)
+  }
+
+  /**
+   * Create edition
+   * @param room_id
+   * @returns {Promise}
+   */
+  createEdition (room_id) {
+    const params = {
+      room_id
+    }
+
+    return this._rpc.send('edition.create', params)
+  }
+
+  /**
+   * List editions
+   * @param room_id
+   * @param {Object} filterParams
+   * @returns {Promise}
+   */
+  listEdition (room_id, filterParams = {}) {
+    const { last_created_at, limit } = filterParams
+    const params = {
+      last_created_at,
+      limit,
+      room_id
+    }
+
+    return this._rpc.send('edition.list', params)
+  }
+
+  /**
+   * Delete edition
+   * @param id
+   * @returns {Promise}
+   */
+  deleteEdition (id) {
+    const params = {
+      id
+    }
+
+    return this._rpc.send('edition.delete', params)
+  }
+
+  /**
+   * Commit edition
+   * @param id
+   * @returns {Promise}
+   */
+  commitEdition (id) {
+    const params = {
+      id
+    }
+
+    return this._rpc.send('edition.commit', params)
+  }
+
+  /**
+   * Create change
+   * @param edition_id
+   * @param type
+   * @param event
+   * @returns {Promise}
+   */
+  createChange (edition_id, type, event) {
+    const params = {
+      edition_id,
+      event,
+      type
+    }
+
+    return this._rpc.send('change.create', params)
+  }
+
+  /**
+   * List changes
+   * @param id
+   * @param {Object} filterParams
+   * @returns {Promise}
+   */
+  listChange (id, filterParams = {}) {
+    const { last_created_at, limit } = filterParams
+    const params = {
+      id,
+      last_created_at,
+      limit
+    }
+
+    return this._rpc.send('change.list', params)
+  }
+
+  /**
+   * Delete change
+   * @param id
+   * @returns {Promise}
+   */
+  deleteChange (id) {
+    const params = {
+      id
+    }
+
+    return this._rpc.send('change.delete', params)
   }
 }
 
