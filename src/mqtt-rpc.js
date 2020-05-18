@@ -11,17 +11,43 @@ class MQTTRPCService {
     this._topicIn = topicIn
     this._topicOut = topicOut
 
+    this._boundedDiscardAllRequests = this._discardAllRequests.bind(this)
+    this._boundedSubscribeIn = this._subscribeIn.bind(this)
+
+    this._subPromise = null
+
     this._addSubscription()
   }
 
   _addSubscription () {
+    this._mqtt.on('close', this._boundedDiscardAllRequests)
+    this._mqtt.on('connect', this._boundedSubscribeIn)
     this._mqtt.attachRoute(this._topicIn, this._handleMessageEvent.bind(this))
-    this._mqtt.subscribe(this._topicIn)
   }
 
   _removeSubscription () {
+    this._mqtt.off('close', this._boundedDiscardAllRequests)
+    this._mqtt.off('connect', this._boundedSubscribeIn)
     this._mqtt.detachRoute(this._topicIn)
     this._mqtt.unsubscribe(this._topicIn)
+  }
+
+  _subscribeIn () {
+    this._subPromise = new Promise((resolve, reject) => {
+      this._mqtt.subscribe(this._topicIn, null, (error) => {
+        if (error) {
+          this._subPromise = null
+
+          reject(error)
+
+          return
+        }
+
+        this._subPromise = null
+
+        resolve()
+      })
+    })
   }
 
   _handleMessageEvent (topicParams, topic, message, packet) {
@@ -66,6 +92,10 @@ class MQTTRPCService {
   }
 
   _processRequest (method, params) {
+    if (!this._mqtt.connected) {
+      return Promise.reject(new Error('[MQTTRPCService] Client disconnected'))
+    }
+
     const id = uuid4()
     const properties = {
       correlationData: id,
@@ -78,20 +108,35 @@ class MQTTRPCService {
     }
 
     const payload = this._codec.encode(params)
-
-    this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
-      if (error) {
-        this._processResponse('reject', id, error)
-      }
-    })
-
-    return new Promise((resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
       this._requestStorage[id] = {
         payload,
         resolve,
         reject
       }
     })
+
+    if (this._subPromise) {
+      this._subPromise
+        .then(() => {
+          this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
+            if (error) {
+              this._processResponse('reject', id, error)
+            }
+          })
+        })
+        .catch((error) => {
+          this._processResponse('reject', id, error)
+        })
+    } else {
+      this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
+        if (error) {
+          this._processResponse('reject', id, error)
+        }
+      })
+    }
+
+    return promise
   }
 
   _processResponse (action, id, response) {
@@ -116,6 +161,14 @@ class MQTTRPCService {
     if (methodHandler && typeof methodHandler === 'function') {
       methodHandler(params)
     }
+  }
+
+  _discardAllRequests () {
+    Object.keys(this._requestStorage).forEach((key) => {
+      this._requestStorage[key].reject(new Error('[MQTTRPCService] Connection closed'))
+    })
+
+    this._requestStorage = {}
   }
 
   send (method, params) {
@@ -144,6 +197,7 @@ class MQTTRPCService {
     this._handlerMap = {}
     this._incomingRequestMap = {}
     this._requestStorage = {}
+    this._subPromise = null
   }
 }
 
