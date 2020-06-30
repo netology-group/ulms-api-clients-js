@@ -1,8 +1,8 @@
-export function rejectByTimeout (promise, timeout) {
+export function rejectByTimeout (promise, timeout, context) {
   return Promise.race([
     promise,
     new Promise((resolve, reject) => {
-      setTimeout(reject, timeout, new Error(`Timeout: service or another peer not responding more than ${timeout} ms`))
+      setTimeout(reject, timeout, new Error(`${context ? `[${context}] ` : ''}Timeout: service or another peer not responding more than ${timeout} ms`))
     })
   ])
 }
@@ -33,7 +33,7 @@ export function enterRoom (client, roomId, agentId, timeout = 5000) {
       rejectFn(error)
     })
 
-  return rejectByTimeout(p, timeout)
+  return rejectByTimeout(p, timeout, ENTER_ROOM)
     .catch((error) => {
       client.off(ENTER_ROOM, enterEventHandler)
 
