@@ -93,7 +93,7 @@ class MQTTRPCService {
 
   _processRequest (method, params) {
     if (!this._mqtt.connected) {
-      return Promise.reject(new Error('[MQTTRPCService] Client disconnected'))
+      return Promise.reject(new Error(`[MQTTRPCService][${method}] Client disconnected`))
     }
 
     const id = uuid4()
@@ -110,6 +110,7 @@ class MQTTRPCService {
     const payload = this._codec.encode(params)
     const promise = new Promise((resolve, reject) => {
       this._requestStorage[id] = {
+        method,
         payload,
         resolve,
         reject
@@ -165,7 +166,9 @@ class MQTTRPCService {
 
   _discardAllRequests () {
     Object.keys(this._requestStorage).forEach((key) => {
-      this._requestStorage[key].reject(new Error('[MQTTRPCService] Connection closed'))
+      const { method, reject } = this._requestStorage[key]
+
+      reject(new Error(`[MQTTRPCService][${method}] Connection closed`))
     })
 
     this._requestStorage = {}
