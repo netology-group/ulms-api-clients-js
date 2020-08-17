@@ -164,6 +164,7 @@ class Conference extends Service {
    * Connect to RTC
    * @param id
    * @param {Object} optionParams
+   * @param {string} [intent=read] optionParams.intent - Intent to connect to RTC
    * @returns {Promise}
    */
   connectRtc (id, optionParams = {}) {
@@ -171,7 +172,7 @@ class Conference extends Service {
       id
     }
 
-    const { intent } = optionParams
+    const { intent = 'read' } = optionParams
 
     if (intent) params.intent = intent
 
