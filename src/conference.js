@@ -163,12 +163,18 @@ class Conference extends Service {
   /**
    * Connect to RTC
    * @param id
+   * @param {Object} optionParams
+   * @param {string} [intent=read] optionParams.intent - Intent to connect to RTC
    * @returns {Promise}
    */
-  connectRtc (id) {
+  connectRtc (id, optionParams = {}) {
     const params = {
       id
     }
+
+    const { intent = 'read' } = optionParams
+
+    if (intent) params.intent = intent
 
     return this._rpc.send('rtc.connect', params)
   }
