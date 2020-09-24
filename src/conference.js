@@ -224,11 +224,13 @@ class Conference extends Service {
    * Send broadcast message
    * @param room_id
    * @param {Object} data
+   * @param {String} label
    * @returns {Promise}
    */
-  sendBroadcastMessage (room_id, data) {
+  sendBroadcastMessage (room_id, data, label) {
     const params = {
       data,
+      label,
       room_id
     }
 
