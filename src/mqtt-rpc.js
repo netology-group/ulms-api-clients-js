@@ -1,5 +1,7 @@
 import { v4 as uuid4 } from 'uuid'
 
+import { MQTTRPCServiceError } from './error'
+
 class MQTTRPCService {
   constructor (mqttClient, topicIn, topicOut, codec, methods) {
     this._codec = codec
@@ -93,7 +95,7 @@ class MQTTRPCService {
 
   _processRequest (method, params) {
     if (!this._mqtt.connected) {
-      return Promise.reject(new Error(`[MQTTRPCService][${method}] Client disconnected`))
+      return Promise.reject(new MQTTRPCServiceError(`[${method}] Client disconnected`))
     }
 
     const id = uuid4()
@@ -168,7 +170,7 @@ class MQTTRPCService {
     Object.keys(this._requestStorage).forEach((key) => {
       const { method, reject } = this._requestStorage[key]
 
-      reject(new Error(`[MQTTRPCService][${method}] Connection closed`))
+      reject(new MQTTRPCServiceError(`[${method}] Connection closed`))
     })
 
     this._requestStorage = {}
@@ -182,7 +184,7 @@ class MQTTRPCService {
     if (!this._handlerMap[method]) {
       this._handlerMap[method] = handler
     } else {
-      throw new Error(`Method ${method} is already registered`)
+      throw new MQTTRPCServiceError(`Method ${method} is already registered`)
     }
   }
 
@@ -190,7 +192,7 @@ class MQTTRPCService {
     if (this._handlerMap[method]) {
       delete this._handlerMap[method]
     } else {
-      throw new Error(`Method ${method} was not registered`)
+      throw new MQTTRPCServiceError(`Method ${method} was not registered`)
     }
   }
 
