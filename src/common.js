@@ -1,8 +1,10 @@
+import { TimeoutError } from './error'
+
 export function rejectByTimeout (promise, timeout, context) {
   return Promise.race([
     promise,
     new Promise((resolve, reject) => {
-      setTimeout(reject, timeout, new Error(`${context ? `[${context}] ` : ''}Timeout: service or another peer not responding more than ${timeout} ms`))
+      setTimeout(reject, timeout, new TimeoutError(`${context ? `[${context}] ` : ''}Service or another peer not responding more than ${timeout} ms`))
     })
   ])
 }
