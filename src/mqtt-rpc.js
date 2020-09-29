@@ -1,6 +1,6 @@
 import { v4 as uuid4 } from 'uuid'
 
-import { MQTTRPCServiceError } from './error'
+import { MQTTClientError, MQTTRPCServiceError } from './error'
 
 class MQTTRPCService {
   constructor (mqttClient, topicIn, topicOut, codec, methods) {
@@ -124,7 +124,7 @@ class MQTTRPCService {
         .then(() => {
           this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
             if (error) {
-              this._processResponse('reject', id, error)
+              this._processResponse('reject', id, MQTTClientError.fromError(error))
             }
           })
         })
@@ -134,7 +134,7 @@ class MQTTRPCService {
     } else {
       this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
         if (error) {
-          this._processResponse('reject', id, error)
+          this._processResponse('reject', id, MQTTClientError.fromError(error))
         }
       })
     }
