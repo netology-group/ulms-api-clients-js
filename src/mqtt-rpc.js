@@ -40,7 +40,7 @@ class MQTTRPCService {
         if (error) {
           this._subPromise = null
 
-          reject(error)
+          reject(MQTTClientError.fromError(error))
 
           return
         }
