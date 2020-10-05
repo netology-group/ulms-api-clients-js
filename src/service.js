@@ -54,6 +54,14 @@ class Service {
     this._ee.removeListener(eventName, eventHandler)
   }
 
+  setLabels (labels) {
+    this._rpc.setLabels(labels)
+  }
+
+  clearLabels () {
+    this._rpc.clearLabels()
+  }
+
   _subMessageHandler (topicParams, topic, message, packet) {
     const payload = this._codec.decode(message)
     const { properties } = packet

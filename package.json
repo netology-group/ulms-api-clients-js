@@ -1,6 +1,6 @@
 {
   "name": "@ulms/api-clients",
-  "version": "0.6.7",
+  "version": "0.7.0",
   "description": "JavaScript API clients for ULMS platform",
   "keywords": [],
   "homepage": "https://github.com/netology-group/ulms-api-clients-js#readme",
@@ -40,25 +40,25 @@
     "uuid": "~7.0.1"
   },
   "devDependencies": {
-    "@babel/cli": "~7.8.4",
-    "@babel/core": "~7.8.6",
-    "@babel/preset-env": "~7.8.6",
-    "@babel/register": "~7.8.6",
-    "babel-loader": "~8.0.6",
-    "babel-plugin-annotate-pure-calls": "^0.4.0",
-    "cross-env": "^7.0.2",
+    "@babel/cli": "~7.11.6",
+    "@babel/core": "~7.11.6",
+    "@babel/preset-env": "~7.11.5",
+    "@babel/register": "~7.11.5",
+    "babel-loader": "~8.1.0",
+    "babel-plugin-annotate-pure-calls": "~0.4.0",
+    "cross-env": "~7.0.2",
     "eslint": "~6.8.0",
     "eslint-config-standard": "~14.1.0",
     "eslint-plugin-import": "~2.20.1",
     "eslint-plugin-node": "~11.0.0",
     "eslint-plugin-promise": "~4.2.1",
     "eslint-plugin-standard": "~4.0.1",
-    "rollup": "^1.12.0",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-terser": "^5.3.0"
+    "rollup": "~1.12.0",
+    "rollup-plugin-babel": "~4.4.0",
+    "rollup-plugin-commonjs": "~10.1.0",
+    "rollup-plugin-node-resolve": "~5.2.0",
+    "rollup-plugin-replace": "~2.2.0",
+    "rollup-plugin-terser": "~5.3.0"
   },
   "peerDependencies": {
     "uuid": ">=7.0.1"

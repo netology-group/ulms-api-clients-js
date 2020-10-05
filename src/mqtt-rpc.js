@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { v4 as uuid4 } from 'uuid'
 
 import { MQTTClientError, MQTTRPCServiceError } from './error'
@@ -7,6 +8,7 @@ class MQTTRPCService {
     this._codec = codec
     this._handlerMap = {}
     this._incomingRequestMap = {}
+    this._labels = {}
     this._mqtt = mqttClient
     this._methods = methods
     this._requestStorage = {}
@@ -85,7 +87,8 @@ class MQTTRPCService {
         userProperties: {
           local_timestamp: Date.now().toString(),
           status: '200',
-          type: 'response'
+          type: 'response',
+          ...this._labels
         }
       }
 
@@ -105,7 +108,8 @@ class MQTTRPCService {
       userProperties: {
         local_timestamp: Date.now().toString(),
         method,
-        type: 'request'
+        type: 'request',
+        ...this._labels
       }
     }
 
@@ -180,6 +184,26 @@ class MQTTRPCService {
     return this._processRequest(method, params)
   }
 
+  setLabels (labels) {
+    const {
+      app_audience,
+      app_label,
+      app_version,
+      scope
+    } = labels
+
+    this._labels = {
+      ...(app_audience !== undefined && { app_audience }),
+      ...(app_label !== undefined && { app_label }),
+      ...(app_version !== undefined && { app_version }),
+      ...(scope !== undefined && { scope })
+    }
+  }
+
+  clearLabels () {
+    this._labels = {}
+  }
+
   register (method, handler) {
     if (!this._handlerMap[method]) {
       this._handlerMap[method] = handler
@@ -198,6 +222,7 @@ class MQTTRPCService {
 
   destroy () {
     this._removeSubscription()
+    this.clearLabels()
 
     this._handlerMap = {}
     this._incomingRequestMap = {}
