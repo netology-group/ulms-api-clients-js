@@ -57,13 +57,14 @@ class MQTTRPCService {
   _handleMessageEvent (topicParams, topic, message, packet) {
     const payload = this._codec.decode(message)
     const { properties } = packet
-    const { correlationData, userProperties: { label, method, status, type } } = properties
+    const { correlationData, userProperties: { label, method, status: s, type } } = properties
+    const status = Number(s)
 
     if (type === 'response' && correlationData) {
-      if (Number(status) >= 200 && Number(status) < 300) {
+      if (status >= 200 && status < 300) {
         this._processResponse('resolve', correlationData, payload)
       } else {
-        this._processResponse('reject', correlationData, payload)
+        this._processResponse('reject', correlationData, payload, { status })
       }
     } else if (type === 'request' && method && correlationData) {
       this._processIncomingRequest(properties, payload)
@@ -123,37 +124,36 @@ class MQTTRPCService {
       }
     })
 
+    const publish = (id, payload, properties) => this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
+      if (error) {
+        this._processResponse('reject', id, MQTTClientError.fromError(error))
+      }
+    })
+
     if (this._subPromise) {
       this._subPromise
         .then(() => {
-          this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
-            if (error) {
-              this._processResponse('reject', id, MQTTClientError.fromError(error))
-            }
-          })
+          publish(id, payload, properties)
         })
         .catch((error) => {
           this._processResponse('reject', id, error)
         })
     } else {
-      this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
-        if (error) {
-          this._processResponse('reject', id, MQTTClientError.fromError(error))
-        }
-      })
+      publish(id, payload, properties)
     }
 
     return promise
   }
 
-  _processResponse (action, id, response) {
+  _processResponse (action, id, response, params = {}) {
     const request = this._requestStorage[id]
+    const { status } = params
 
     if (request) {
       if (action === 'resolve') {
         request.resolve(response)
       } else {
-        request.reject(response)
+        request.reject({ response, status })
       }
 
       delete this._requestStorage[id]

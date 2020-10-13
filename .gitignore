@@ -51,5 +51,7 @@ dist
 .Spotlight-V100
 .Trashes
 
+*.sw*
+
 /lib/
 /es/
