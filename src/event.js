@@ -16,10 +16,11 @@ class Event extends Service {
 
   /**
    * Events enum
-   * @returns {{EVENT_CREATE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
+   * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
    */
   static get events () {
     return {
+      AGENT_UPDATE: 'agent.update',
       EVENT_CREATE: 'event.create',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave'
@@ -114,6 +115,23 @@ class Event extends Service {
     }
 
     return this._rpc.send('agent.list', params)
+  }
+
+  /**
+   * Update agent in room (currently only ban or un-ban)
+   * @param room_id
+   * @param account_id
+   * @param {Boolean} value
+   * @returns {Promise}
+   */
+  updateAgent (room_id, account_id, value) {
+    const params = {
+      account_id,
+      room_id,
+      value
+    }
+
+    return this._rpc.send('agent.update', params)
   }
 
   /**
