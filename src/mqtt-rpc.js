@@ -11,6 +11,7 @@ class MQTTRPCService {
     this._labels = {}
     this._mqtt = mqttClient
     this._methods = methods
+    this._publishQoS = 1
     this._requestStorage = {}
     this._topicIn = topicIn
     this._topicOut = topicOut
@@ -93,7 +94,7 @@ class MQTTRPCService {
         }
       }
 
-      this._mqtt.publish(responseTopic, this._codec.encode(result), { properties })
+      this._mqtt.publish(responseTopic, this._codec.encode(result), { properties, qos: this._publishQoS })
     }
   }
 
@@ -124,11 +125,16 @@ class MQTTRPCService {
       }
     })
 
-    const publish = (id, payload, properties) => this._mqtt.publish(this._topicOut, payload, { properties }, (error) => {
-      if (error) {
-        this._processResponse('reject', id, MQTTClientError.fromError(error))
+    const publish = (id, payload, properties) => this._mqtt.publish(
+      this._topicOut,
+      payload,
+      { properties, qos: this._publishQoS },
+      (error) => {
+        if (error) {
+          this._processResponse('reject', id, MQTTClientError.fromError(error))
+        }
       }
-    })
+    )
 
     if (this._subPromise) {
       this._subPromise

@@ -6,6 +6,7 @@ class Telemetry {
     this._agentId = agentId
     this._appName = appName
     this._labels = {}
+    this._publishQoS = 1
     this._topicOut = `agents/${this._agentId}/api/v1/out/${this._appName}`
     this._mqtt = mqttClient
 
@@ -29,7 +30,7 @@ class Telemetry {
       }
     }
 
-    this._mqtt.publish(this._topicOut, this._codec.encode(params), { properties })
+    this._mqtt.publish(this._topicOut, this._codec.encode(params), { properties, qos: this._publishQoS })
   }
 
   setLabels (labels) {
