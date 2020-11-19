@@ -16,12 +16,13 @@ class Event extends Service {
 
   /**
    * Events enum
-   * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
+   * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
    */
   static get events () {
     return {
       AGENT_UPDATE: 'agent.update',
       EVENT_CREATE: 'event.create',
+      ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave'
     }
@@ -122,12 +123,14 @@ class Event extends Service {
    * @param room_id
    * @param account_id
    * @param {Boolean} value
+   * @param {String} reason
    * @returns {Promise}
    */
-  updateAgent (room_id, account_id, value) {
+  updateAgent (room_id, account_id, value, reason) {
     const params = {
       account_id,
       room_id,
+      reason,
       value
     }
 
