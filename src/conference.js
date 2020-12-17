@@ -4,13 +4,26 @@ import { Service } from './service.js'
 class Conference extends Service {
   /**
    * Conference events enum
-   * @returns {{ROOM_ENTER: string, ROOM_LEAVE: string, RTC_STREAM_UPDATE: string}}
+   * @returns {{ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string, ROOM_OPEN: string, RTC_STREAM_UPDATE: string}}
    */
   static get events () {
     return {
+      ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
+      ROOM_OPEN: 'room.open',
       RTC_STREAM_UPDATE: 'rtc_stream.update'
+    }
+  }
+
+  /**
+   * Conference intents enum
+   * @returns {{INTENT_READ: string, INTENT_WRITE: string}}
+   */
+  static get intents () {
+    return {
+      INTENT_READ: 'read',
+      INTENT_WRITE: 'write'
     }
   }
 
@@ -19,12 +32,16 @@ class Conference extends Service {
    * @param {String} audience
    * @param {[Number, Number]} time
    * @param {String} backend
+   * @param {Number} reserve
+   * @param {Object} tags
    * @returns {Promise}
    */
-  createRoom (audience, time, backend) {
+  createRoom (audience, time, backend, reserve, tags) {
     const params = {
       audience,
       backend,
+      reserve,
+      tags,
       time
     }
 
@@ -162,19 +179,23 @@ class Conference extends Service {
 
   /**
    * Connect to RTC
-   * @param id
+   * @param {String} id
+   * @param {String} handle_id
    * @param {Object} optionParams
-   * @param {string} [intent=read] optionParams.intent - Intent to connect to RTC
+   * @param {string} [intent=read] optionParams.intent - Intent to connect to RTC ('read' or 'write')
+   * @param {string} [label] optionParams.label - An arbitrary label to mark the stream. Required only with intent = 'write'.
    * @returns {Promise}
    */
-  connectRtc (id, optionParams = {}) {
+  connectRtc (id, handle_id, optionParams = {}) {
     const params = {
+      handle_id,
       id
     }
 
-    const { intent = 'read' } = optionParams
+    const { intent = Conference.intents.INTENT_READ, label } = optionParams
 
     if (intent) params.intent = intent
+    if (label) params.label = label
 
     return this._rpc.send('rtc.connect', params)
   }
@@ -205,6 +226,7 @@ class Conference extends Service {
 
   /**
    * Create RTC signal
+   * @deprecated
    * @param {String} handle_id
    * @param {Object} jsep
    * @param {String} label
@@ -218,6 +240,51 @@ class Conference extends Service {
     }
 
     return this._rpc.send('rtc_signal.create', params)
+  }
+
+  /**
+   * Create signal
+   * @param {String} room_id
+   * @param {Object} jsep
+   * @returns {Promise}
+   */
+  createSignal (room_id, jsep) {
+    const params = {
+      jsep,
+      room_id
+    }
+
+    return this._rpc.send('signal.create', params)
+  }
+
+  /**
+   * Create 'trickle' signal
+   * @param {String} handle_id
+   * @param {Object} jsep
+   * @returns {Promise}
+   */
+  createTrickleSignal (handle_id, jsep) {
+    const params = {
+      handle_id,
+      jsep
+    }
+
+    return this._rpc.send('signal.trickle', params)
+  }
+
+  /**
+   * Update signal
+   * @param {String} handle_id
+   * @param {Object} jsep
+   * @returns {Promise}
+   */
+  updateSignal (handle_id, jsep) {
+    const params = {
+      handle_id,
+      jsep
+    }
+
+    return this._rpc.send('signal.update', params)
   }
 
   /**
