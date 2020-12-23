@@ -147,12 +147,14 @@ class Event extends Service {
    */
   createEvent (room_id, type, data, eventParams = {}) {
     const {
+      attribute,
       is_claim,
       is_persistent,
       label,
       set
     } = eventParams
     const params = {
+      attribute,
       data,
       is_claim,
       is_persistent,
@@ -173,6 +175,7 @@ class Event extends Service {
    */
   listEvent (room_id, filterParams = {}) {
     const {
+      attribute,
       direction,
       label,
       last_occurred_at,
@@ -181,6 +184,7 @@ class Event extends Service {
       type
     } = filterParams
     const params = {
+      attribute,
       direction,
       label,
       last_occurred_at,
@@ -202,11 +206,13 @@ class Event extends Service {
    */
   readState (room_id, sets, filterParams = {}) {
     const {
+      attribute,
       limit,
       occurred_at,
       original_occurred_at
     } = filterParams
     const params = {
+      attribute,
       limit,
       occurred_at,
       original_occurred_at,
