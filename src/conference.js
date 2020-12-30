@@ -180,15 +180,13 @@ class Conference extends Service {
   /**
    * Connect to RTC
    * @param {String} id
-   * @param {String} handle_id
    * @param {Object} optionParams
    * @param {string} [intent=read] optionParams.intent - Intent to connect to RTC ('read' or 'write')
    * @param {string} [label] optionParams.label - An arbitrary label to mark the stream. Required only with intent = 'write'.
    * @returns {Promise}
    */
-  connectRtc (id, handle_id, optionParams = {}) {
+  connectRtc (id, optionParams = {}) {
     const params = {
-      handle_id,
       id
     }
 
@@ -225,24 +223,6 @@ class Conference extends Service {
   }
 
   /**
-   * Create RTC signal
-   * @deprecated
-   * @param {String} handle_id
-   * @param {Object} jsep
-   * @param {String} label
-   * @returns {Promise}
-   */
-  createRtcSignal (handle_id, jsep, label) {
-    const params = {
-      jsep,
-      handle_id,
-      label
-    }
-
-    return this._rpc.send('rtc_signal.create', params)
-  }
-
-  /**
    * Create signal
    * @param {String} room_id
    * @param {Object} jsep
@@ -259,14 +239,14 @@ class Conference extends Service {
 
   /**
    * Create 'trickle' signal
-   * @param {String} handle_id
+   * @param {String} room_id
    * @param {Object} jsep
    * @returns {Promise}
    */
-  createTrickleSignal (handle_id, jsep) {
+  createTrickleSignal (room_id, jsep) {
     const params = {
-      handle_id,
-      jsep
+      jsep,
+      room_id
     }
 
     return this._rpc.send('signal.trickle', params)
@@ -274,14 +254,14 @@ class Conference extends Service {
 
   /**
    * Update signal
-   * @param {String} handle_id
+   * @param {String} room_id
    * @param {Object} jsep
    * @returns {Promise}
    */
-  updateSignal (handle_id, jsep) {
+  updateSignal (room_id, jsep) {
     const params = {
-      handle_id,
-      jsep
+      jsep,
+      room_id
     }
 
     return this._rpc.send('signal.update', params)
