@@ -4,12 +4,13 @@ import { Codec } from './codec.js'
 import { MQTTRPCService } from './mqtt-rpc.js'
 
 class Service {
-  constructor (mqttClient, agentId, appName) {
+  constructor (mqttClient, agentId, appName, appVersion = 'v1') {
     this._agentId = agentId
     this._appName = appName
-    this._topicIn = `agents/${this._agentId}/api/v1/in/${this._appName}`
-    this._topicOut = `agents/${this._agentId}/api/v1/out/${this._appName}`
-    this._topicPatternNotifications = `apps/${this._appName}/api/v1/rooms/+roomId/events`
+    this._appVersion = appVersion
+    this._topicIn = `agents/${this._agentId}/api/${this._appVersion}/in/${this._appName}`
+    this._topicOut = `agents/${this._agentId}/api/${this._appVersion}/out/${this._appName}`
+    this._topicPatternNotifications = `apps/${this._appName}/api/${this._appVersion}/rooms/+roomId/events`
     this._mqtt = mqttClient
 
     this._codec = new Codec(

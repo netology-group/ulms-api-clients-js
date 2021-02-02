@@ -2,12 +2,13 @@
 import { Codec } from './codec.js'
 
 class Telemetry {
-  constructor (mqttClient, agentId, appName) {
+  constructor (mqttClient, agentId, appName, appVersion = 'v1') {
     this._agentId = agentId
     this._appName = appName
+    this._appVersion = appVersion
     this._labels = {}
     this._publishQoS = 1
-    this._topicOut = `agents/${this._agentId}/api/v1/out/${this._appName}`
+    this._topicOut = `agents/${this._agentId}/api/${this._appVersion}/out/${this._appName}`
     this._mqtt = mqttClient
 
     this._codec = new Codec(
