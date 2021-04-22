@@ -22,6 +22,10 @@ class MQTTRPCService {
     this._subPromise = null
 
     this._addSubscription()
+
+    if (this._mqtt && this._mqtt.connected) {
+      this._subscribeIn()
+    }
   }
 
   _addSubscription () {
