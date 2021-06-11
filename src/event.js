@@ -21,6 +21,7 @@ class Event extends Service {
   static get events () {
     return {
       AGENT_UPDATE: 'agent.update',
+      EVENT_BROADCAST: 'event.broadcast',
       EVENT_CREATE: 'event.create',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
@@ -78,11 +79,13 @@ class Event extends Service {
   /**
    * Enter room
    * @param id
+   * @param broadcast_subscription
    * @returns {Promise}
    */
-  enterRoom (id) {
+  enterRoom (id, broadcast_subscription = true) {
     const params = {
-      id
+      id,
+      broadcast_subscription
     }
 
     return this._rpc.send('room.enter', params)
@@ -324,6 +327,19 @@ class Event extends Service {
     }
 
     return this._rpc.send('change.delete', params)
+  }
+
+  /**
+   * Send broadcast message
+   * @param room_id
+   * @param {Object} data
+   * @returns {Promise}
+   */
+  sendBroadcastMessage (room_id, data) {
+    const params = data
+    const topic = this._topicBroadcastFn(room_id)
+
+    return this._rpc.broadcast(topic, 'event.broadcast', params)
   }
 }
 

@@ -80,6 +80,44 @@ class MQTTRPCService {
     }
   }
 
+  _processBroadcast (topic, label, params) {
+    if (!this._mqtt.connected) {
+      return Promise.reject(new MQTTRPCServiceError(`[${label}] Client disconnected`))
+    }
+
+    const properties = {
+      userProperties: {
+        label,
+        local_timestamp: Date.now().toString(),
+        type: 'event',
+        ...this._labels
+      }
+    }
+
+    const payload = this._codec.encode(params)
+    let resolve
+    let reject
+    const promise = new Promise((resolveFn, rejectFn) => {
+      resolve = resolveFn
+      reject = rejectFn
+    })
+
+    this._mqtt.publish(
+      topic,
+      payload,
+      { properties, qos: this._publishQoS },
+      (error) => {
+        if (error) {
+          reject(MQTTClientError.fromError(error))
+        } else {
+          resolve()
+        }
+      }
+    )
+
+    return promise
+  }
+
   _processIncomingRequest (properties, payload) {
     const { correlationData, responseTopic, userProperties: { method } } = properties
     const handler = this._handlerMap[method]
@@ -188,6 +226,10 @@ class MQTTRPCService {
     })
 
     this._requestStorage = {}
+  }
+
+  broadcast (topic, label, params) {
+    return this._processBroadcast(topic, label, params)
   }
 
   send (method, params) {

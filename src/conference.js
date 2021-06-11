@@ -264,6 +264,7 @@ class Conference extends Service {
 
   /**
    * Send broadcast message
+   * @deprecated
    * @param room_id
    * @param {Object} data
    * @param {String} label
