@@ -95,11 +95,11 @@ class MQTTRPCService {
     }
 
     const payload = this._codec.encode(params)
-    let resolve
-    let reject
-    const promise = new Promise((resolveFn, rejectFn) => {
-      resolve = resolveFn
-      reject = rejectFn
+    let resolveFn
+    let rejectFn
+    const promise = new Promise((resolve, reject) => {
+      resolveFn = resolve
+      rejectFn = reject
     })
 
     this._mqtt.publish(
@@ -108,9 +108,9 @@ class MQTTRPCService {
       { properties, qos: this._publishQoS },
       (error) => {
         if (error) {
-          reject(MQTTClientError.fromError(error))
+          rejectFn(MQTTClientError.fromError(error))
         } else {
-          resolve()
+          resolveFn()
         }
       }
     )
